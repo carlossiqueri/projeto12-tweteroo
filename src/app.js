@@ -13,7 +13,7 @@ app.post("/sign-up", (req, res) => {
   const { username, avatar } = req.body;
 
   if (!username || !avatar) {
-    return res.status(422).send("Todos os campos são obrigatórios");
+    return res.status(400).send("Todos os campos são obrigatórios");
   }
 
   const newUser = { id: users.length + 1, username, avatar };
@@ -22,22 +22,29 @@ app.post("/sign-up", (req, res) => {
 });
 
 app.post("/tweets", (req, res) => {
-    const {username, tweet} = req.body;
+  const { username, tweet } = req.body;
 
-    const check = users.find((user) => user.username === username);
+  const check = users.find((u) => u.username === username);
 
-    if(!check){
-        return res.status(401).send("UNAUTHORIZED")
-    }
+  if (!check) {
+    return res.status(401).send("UNAUTHORIZED");
+  }
 
-    const newTweet = {username, tweet};
+  const newTweet = { username, tweet };
 
-    tweets.push(newTweet);
-    res.status(201).send("OK")
+  tweets.push(newTweet);
+  res.status(201).send("OK");
 });
 
-app.get("/tweets", (req, resp) => {
-    
+app.get("/tweets", (req, res) => {
+  tweets.forEach((t) => {
+    const user = users.find((u) => {
+      t.username === u.username;
+      t.avatar = u.avatar;
+    });
+  });
+  const shownTweets = tweets.slice(-10);
+  res.send(shownTweets);
 });
 
 const PORT = 5000;
